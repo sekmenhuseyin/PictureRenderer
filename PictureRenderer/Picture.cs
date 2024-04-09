@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
 using System.Web;
 using PictureRenderer.Profiles;
+// ReSharper disable UnusedMember.Global
 
 namespace PictureRenderer
 {

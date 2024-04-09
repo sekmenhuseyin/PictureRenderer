@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace PictureRenderer.Profiles
+﻿namespace PictureRenderer.Profiles
 {
     public class ImageSharpProfile : PictureProfileBase
     {
@@ -12,7 +8,7 @@ namespace PictureRenderer.Profiles
         /// </summary>
         public string[] CreateWebpForFormat { get; set; }
 
-        public ImageSharpProfile() : base()
+        public ImageSharpProfile()
         {
             Quality = 80;
             CreateWebpForFormat = new[] { ImageFormat.Jpeg };

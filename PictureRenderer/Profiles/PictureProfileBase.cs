@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 
 namespace PictureRenderer.Profiles
 {
@@ -20,8 +18,6 @@ namespace PictureRenderer.Profiles
         /// Default value is 80.
         /// </summary>
         public int? Quality { get; set; }
-
-        
 
         /// <summary>
         /// Image width for browsers without support for picture element. Will use the largest image if not set.
@@ -65,7 +61,7 @@ namespace PictureRenderer.Profiles
         /// <summary>
         /// Img element decoding attribute.
         /// </summary>
-        public ImageDecoding ImageDecoding {get; set;}
+        public ImageDecoding ImageDecoding {get; set;} = ImageDecoding.Async;
 
         /// <summary>
         /// Img element fetchPriority attribute.
@@ -73,13 +69,5 @@ namespace PictureRenderer.Profiles
         public FetchPriority FetchPriority {get; set;}
 
         public bool ShowInfo { get; set; }
-
-
-        protected PictureProfileBase()
-        {
-
-            ImageDecoding = ImageDecoding.Async;
-            ShowInfo = false;
-        }
     }
 }

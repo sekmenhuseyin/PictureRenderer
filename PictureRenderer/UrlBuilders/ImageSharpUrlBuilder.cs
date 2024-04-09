@@ -1,8 +1,6 @@
 ﻿using PictureRenderer.Profiles;
 using System;
-using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Text;
 using System.Web;
 
 namespace PictureRenderer.UrlBuilders
@@ -39,11 +37,13 @@ namespace PictureRenderer.UrlBuilders
 
         private static NameValueCollection AddFocalPointQuery((double x, double y) focalPoint, NameValueCollection queryItems)
         {
-            if ((focalPoint.x > 0 || focalPoint.y > 0) && queryItems["rxy"] == null)
+            if ((focalPoint.x <= 0 && focalPoint.y <= 0) || queryItems["rxy"] != null)
             {
-                var (x, y) = PictureUtils.FocalPointAsString(focalPoint);
-                queryItems.Add("rxy", $"{x},{y}");
+                return queryItems;
             }
+
+            var (x, y) = PictureUtils.FocalPointAsString(focalPoint);
+            queryItems.Add("rxy", $"{x},{y}");
 
             return queryItems;
         }

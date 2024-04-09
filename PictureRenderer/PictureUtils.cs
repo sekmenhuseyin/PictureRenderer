@@ -15,7 +15,7 @@ namespace PictureRenderer
         {
             if (profile.SrcSetWidths == null || profile.Sizes == null)
             {
-                throw new ArgumentException($"SrcSetWidths and/or Sizes are not defined in Picture profile.");
+                throw new ArgumentException("SrcSetWidths and/or Sizes are not defined in Picture profile.");
             }
 
             var uri = GetUriFromPath(imagePath);
@@ -92,22 +92,17 @@ namespace PictureRenderer
 
         private static string BuildImageUrl(Uri uri, PictureProfileBase profile, int imageWidth, string wantedFormat, (double x, double y) focalPoint)
         {
-            if (profile is ImageSharpProfile imageSharpProfile)
+            switch (profile)
             {
-                return ImageSharpUrlBuilder.BuildImageUrl(uri, imageSharpProfile, imageWidth, wantedFormat, focalPoint);
+                case ImageSharpProfile imageSharpProfile:
+                    return ImageSharpUrlBuilder.BuildImageUrl(uri, imageSharpProfile, imageWidth, wantedFormat, focalPoint);
+                case StoryblokProfile storyblokProfile:
+                    return StoryblokUrlBuilder.BuildStoryblokUrl(uri, storyblokProfile, imageWidth, focalPoint);
+                case CloudflareProfile cloudflareProfile:
+                    return CloudflareUrlBuilder.BuildCloudflareUrl(uri, cloudflareProfile, imageWidth, focalPoint);
+                default:
+                    return string.Empty;
             }
-            
-            if (profile is StoryblokProfile storyblokProfile)
-            {
-                return StoryblokUrlBuilder.BuildStoryblokUrl(uri, storyblokProfile, imageWidth, focalPoint);
-            }
-
-            if (profile is CloudflareProfile cloudflareProfile)
-            {
-                return CloudflareUrlBuilder.BuildCloudflareUrl(uri, cloudflareProfile, imageWidth, focalPoint);
-            }
-            
-            return string.Empty;
         }
 
         internal static (string x, string y) FocalPointAsString((double x, double y) focalPoint)
@@ -125,7 +120,8 @@ namespace PictureRenderer
             {
                 return Convert.ToInt32(imageWidth / profile.AspectRatio);
             }
-            else if (profile.FixedHeight != null && profile.FixedHeight > 0)
+            
+            if (profile.FixedHeight != null && profile.FixedHeight > 0)
             {
                 return profile.FixedHeight.Value;
             }
@@ -146,27 +142,32 @@ namespace PictureRenderer
 
         private static Uri GetUriFromPath(string imagePath)
         {
-            if (!IsValidHttpUri(imagePath, out var uri))
+            if (IsValidHttpUri(imagePath, out var uri))
             {
-                //A Uri object must have a domain, but imagePath might be just a path. Add dummy domain, and test again.
-                imagePath = "https://dummy-xyz.com" + imagePath; 
-                if (!IsValidHttpUri(imagePath, out uri))
-                {
-                    throw new ArgumentException($"Image url '{imagePath}' is not well formatted.");
-                }
+                return uri;
             }
 
-            return uri;
+            //A Uri object must have a domain, but imagePath might be just a path. Add dummy domain, and test again.
+            imagePath = "https://dummy-xyz.com" + imagePath;
+            if (IsValidHttpUri(imagePath, out uri))
+            {
+                return uri;
+            }
+
+            throw new ArgumentException($"Image url '{imagePath}' is not well formatted.");
+
         }
 
         internal static string GetImageDomain(Uri uri)
         {
             var domain = string.Empty;
-            if (!uri.Host.Contains("dummy-xyz.com"))
+            if (uri.Host.Contains("dummy-xyz.com"))
             {
-                //return the original image url domain.
-                domain = uri.GetLeftPart(UriPartial.Authority);
+                return domain;
             }
+
+            //return the original image url domain.
+            domain = uri.GetLeftPart(UriPartial.Authority);
             return domain;
         }
 
